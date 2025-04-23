@@ -10,7 +10,27 @@
     --error-color: #f44336;
     --clan-color: #ff9800;
 }
+/* Добавить в CSS */
+:root {
+    --bg-color: #1a1a2e;
+    --text-color: #ffffff;
+    --header-bg: rgba(22, 33, 62, 0.8);
+    /* ... остальные переменные ... */
+}
 
+[data-theme="light"] {
+    --bg-color: #f5f5f7;
+    --text-color: #333333;
+    --header-bg: rgba(255, 255, 255, 0.9);
+    /* ... светлые версии всех переменных ... */
+}
+
+.theme-toggle {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+}
 /* Добавить в CSS */
 .screen-shake {
     animation: shake 0.3s cubic-bezier(.36,.07,.19,.97) both;
