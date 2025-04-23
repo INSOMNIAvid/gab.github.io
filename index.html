@@ -11,6 +11,11 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <!-- Theme Toggle -->
+    <div class="theme-toggle" id="theme-toggle">
+        <div class="toggle-ball"></div>
+    </div>
+
     <!-- Player Profile -->
     <div class="player-profile" id="player-profile">
         <div class="player-avatar" id="player-avatar">👤</div>
@@ -72,7 +77,10 @@
                 <!-- Friends will be added via JS -->
                 <div class="no-friends" data-i18n="noFriends">You don't have friends yet</div>
             </div>
-            <button class="add-friend-btn" id="add-friend-btn" data-i18n="addFriend">Add Friend</button>
+            <div class="friend-actions">
+                <button class="add-friend-btn" id="add-friend-btn" data-i18n="addFriend">Add Friend</button>
+                <button class="find-friend-btn" id="find-friend-btn" data-i18n="findFriend">Find by ID</button>
+            </div>
         </div>
         
         <div class="profile-tab-content" id="clans-tab">
@@ -84,6 +92,24 @@
             <div class="clans-list" id="clans-list" style="display: none;">
                 <!-- Top clans will be added via JS -->
             </div>
+        </div>
+    </div>
+
+    <!-- Find Friend Popup -->
+    <div class="find-friend-popup" id="find-friend-popup">
+        <div class="find-friend-header">
+            <h3 data-i18n="findFriend">Find Friend</h3>
+            <button class="close-find-friend" id="close-find-friend">×</button>
+        </div>
+        <div class="find-friend-form">
+            <div class="form-group">
+                <label for="friend-id-input" data-i18n="friendId">Friend ID (e.g. Player#12345)</label>
+                <input type="text" id="friend-id-input" placeholder="Player#12345">
+            </div>
+            <button class="find-friend-confirm" id="find-friend-confirm" data-i18n="find">Find</button>
+        </div>
+        <div class="friend-search-results" id="friend-search-results">
+            <!-- Search results will appear here -->
         </div>
     </div>
 
@@ -149,6 +175,16 @@
         
         <div class="clan-description" id="clan-description" data-i18n="noDescription">No description yet</div>
         
+        <div class="clan-settings">
+            <div class="clan-setting-item">
+                <span data-i18n="clanType">Clan Type:</span>
+                <div class="clan-type-toggle" id="clan-type-toggle">
+                    <span class="clan-type-option active" data-type="open">Open</span>
+                    <span class="clan-type-option" data-type="closed">Closed</span>
+                </div>
+            </div>
+        </div>
+        
         <div class="clan-members-title" data-i18n="clanMembers">Members</div>
         <div class="clan-members-list" id="clan-members-list">
             <!-- Clan members will be added via JS -->
@@ -190,6 +226,21 @@
                     <div class="clan-icon-option">🐉</div>
                     <div class="clan-icon-option">🌙</div>
                     <div class="clan-icon-option">🌟</div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label data-i18n="clanType">Clan Type</label>
+                <div class="clan-type-selector">
+                    <div class="clan-type-option active" data-type="open">
+                        <div class="clan-type-icon">🔓</div>
+                        <div class="clan-type-name" data-i18n="openClan">Open</div>
+                        <div class="clan-type-desc" data-i18n="openClanDesc">Anyone can join</div>
+                    </div>
+                    <div class="clan-type-option" data-type="closed">
+                        <div class="clan-type-icon">🔒</div>
+                        <div class="clan-type-name" data-i18n="closedClan">Closed</div>
+                        <div class="clan-type-desc" data-i18n="closedClanDesc">Invite only</div>
+                    </div>
                 </div>
             </div>
             <div class="form-group">
@@ -236,6 +287,9 @@
             </div>
             <div class="settings-menu-item" id="change-bg-emoji-btn" style="display:none;">
                 <i>🌌</i> <span data-i18n="changeBgEmoji">Change BG Emoji</span>
+            </div>
+            <div class="settings-menu-item" id="sound-toggle">
+                <i>🔊</i> <span data-i18n="sound">Sound</span>
             </div>
         </div>
     </div>
@@ -363,6 +417,13 @@
                 <h3 data-i18n="topClans">Top Clans</h3>
                 <div class="top-clans-list" id="top-clans-list">
                     <!-- Top clans will be added via JS -->
+                </div>
+            </div>
+            
+            <div class="global-leaderboard">
+                <h3 data-i18n="globalLeaderboard">Global Leaderboard</h3>
+                <div class="leaderboard-list" id="leaderboard-list">
+                    <!-- Leaderboard will be added via JS -->
                 </div>
             </div>
         </div>
@@ -532,6 +593,12 @@
 
     <!-- Toast Notifications -->
     <div id="toast" class="toast"></div>
+
+    <!-- Audio Elements -->
+    <audio id="click-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-arcade-game-jump-coin-216.mp3" preload="auto"></audio>
+    <audio id="coin-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-coins-handling-1939.mp3" preload="auto"></audio>
+    <audio id="achievement-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-achievement-bell-600.mp3" preload="auto"></audio>
+    <audio id="bg-music" loop src="https://assets.mixkit.co/music/preview/mixkit-game-show-suspense-waiting-668.mp3" preload="auto"></audio>
 
     <script src="script.js"></script>
 </body>
