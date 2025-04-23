@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Insomnia Clicker - interactive game for earning virtual currency">
+    <title>Insomnia Clicker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Player Profile -->
+    <div class="player-profile" id="player-profile">
+        <div class="player-avatar" id="player-avatar">👤</div>
+        <div class="player-info">
+            <div class="player-name" id="player-name">Player</div>
+            <div class="player-tag" id="player-tag">#00000</div>
+            <div class="player-level" id="player-level">Lvl 1</div>
+        </div>
+    </div>
+
+    <!-- Profile Popup -->
+    <div class="profile-popup" id="profile-popup">
+        <div class="profile-header">
+            <div class="profile-avatar" id="profile-avatar">👤</div>
+            <div class="profile-details">
+                <div class="profile-name" id="profile-name">Player</div>
+                <div class="profile-tag" id="profile-tag">#00000</div>
+                <div class="profile-level" id="profile-level">Level 1</div>
+            </div>
+        </div>
+        
+        <div class="profile-stats">
+            <div class="stat-item">
+                <div class="stat-value" id="stat-clicks">0</div>
+                <div class="stat-label" data-i18n="statClicks">Clicks</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="stat-coins">0</div>
+                <div class="stat-label" data-i18n="statCoins">$INSOMNIA</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="stat-refs">0</div>
+                <div class="stat-label" data-i18n="statRefs">Referrals</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="stat-quests">0</div>
+                <div class="stat-label" data-i18n="statQuests">Quests</div>
+            </div>
+        </div>
+        
+        <div class="profile-tabs">
+            <div class="profile-tab active" data-tab="achievements-tab">Achievements</div>
+            <div class="profile-tab" data-tab="friends-tab">Friends</div>
+            <div class="profile-tab" data-tab="clans-tab">Clans</div>
+        </div>
+        
+        <div class="profile-tab-content active" id="achievements-tab">
+            <div class="section-title">
+                <span data-i18n="achievements">Achievements</span>
+                <span style="margin-left: auto; font-size: 12px;" id="achievements-count">0/12</span>
+            </div>
+            <div class="achievements-grid" id="achievements-grid">
+                <!-- Achievements will be added via JS -->
+            </div>
+        </div>
+        
+        <div class="profile-tab-content" id="friends-tab">
+            <div class="friends-list" id="friends-list">
+                <!-- Friends will be added via JS -->
+                <div class="no-friends" data-i18n="noFriends">You don't have friends yet</div>
+            </div>
+            <button class="add-friend-btn" id="add-friend-btn" data-i18n="addFriend">Add Friend</button>
+        </div>
+        
+        <div class="profile-tab-content" id="clans-tab">
+            <div class="clan-info" id="clan-info">
+                <div class="no-clan" data-i18n="noClan">You're not in a clan</div>
+                <button class="create-clan-btn" id="create-clan-btn" data-i18n="createClan">Create Clan</button>
+                <button class="join-clan-btn" id="join-clan-btn" data-i18n="joinClan">Join Clan</button>
+            </div>
+            <div class="clans-list" id="clans-list" style="display: none;">
+                <!-- Top clans will be added via JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Friend Profile Popup -->
+    <div class="friend-profile-popup" id="friend-profile-popup">
+        <div class="friend-profile-header">
+            <div class="friend-profile-avatar" id="friend-profile-avatar">👤</div>
+            <div class="friend-profile-details">
+                <div class="friend-profile-name" id="friend-profile-name">Friend</div>
+                <div class="friend-profile-tag" id="friend-profile-tag">#00000</div>
+                <div class="friend-profile-level" id="friend-profile-level">Level 1</div>
+            </div>
+            <button class="close-friend-profile" id="close-friend-profile">×</button>
+        </div>
+        
+        <div class="friend-profile-stats">
+            <div class="stat-item">
+                <div class="stat-value" id="friend-stat-clicks">0</div>
+                <div class="stat-label" data-i18n="statClicks">Clicks</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="friend-stat-coins">0</div>
+                <div class="stat-label" data-i18n="statCoins">$INSOMNIA</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="friend-stat-clan">-</div>
+                <div class="stat-label" data-i18n="statClan">Clan</div>
+            </div>
+        </div>
+        
+        <div class="friend-actions">
+            <button class="send-gift-btn" id="send-gift-btn" data-i18n="sendGift">Send Gift</button>
+            <button class="remove-friend-btn" id="remove-friend-btn" data-i18n="removeFriend">Remove Friend</button>
+        </div>
+    </div>
+
+    <!-- Clan Popup -->
+    <div class="clan-popup" id="clan-popup">
+        <div class="clan-header">
+            <div class="clan-icon" id="clan-icon">🛡️</div>
+            <div class="clan-details">
+                <div class="clan-name" id="clan-name">Clan Name</div>
+                <div class="clan-tag" id="clan-tag">[TAG]</div>
+                <div class="clan-level" id="clan-level">Level 1</div>
+            </div>
+            <button class="close-clan-popup" id="close-clan-popup">×</button>
+        </div>
+        
+        <div class="clan-stats">
+            <div class="stat-item">
+                <div class="stat-value" id="clan-members">1/20</div>
+                <div class="stat-label" data-i18n="clanMembers">Members</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="clan-total-clicks">0</div>
+                <div class="stat-label" data-i18n="clanTotalClicks">Total Clicks</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="clan-rank">-</div>
+                <div class="stat-label" data-i18n="clanRank">Rank</div>
+            </div>
+        </div>
+        
+        <div class="clan-description" id="clan-description" data-i18n="noDescription">No description yet</div>
+        
+        <div class="clan-members-title" data-i18n="clanMembers">Members</div>
+        <div class="clan-members-list" id="clan-members-list">
+            <!-- Clan members will be added via JS -->
+        </div>
+        
+        <div class="clan-actions" id="clan-actions">
+            <!-- Clan actions will be added via JS -->
+        </div>
+    </div>
+
+    <!-- Create Clan Popup -->
+    <div class="create-clan-popup" id="create-clan-popup">
+        <div class="create-clan-header">
+            <h3 data-i18n="createClan">Create Clan</h3>
+            <button class="close-create-clan" id="close-create-clan">×</button>
+        </div>
+        
+        <div class="create-clan-form">
+            <div class="form-group">
+                <label for="clan-name-input" data-i18n="clanName">Clan Name</label>
+                <input type="text" id="clan-name-input" maxlength="20">
+            </div>
+            <div class="form-group">
+                <label for="clan-tag-input" data-i18n="clanTag">Clan Tag (3-5 letters)</label>
+                <input type="text" id="clan-tag-input" maxlength="5">
+            </div>
+            <div class="form-group">
+                <label for="clan-description-input" data-i18n="clanDescription">Description</label>
+                <textarea id="clan-description-input" maxlength="200"></textarea>
+            </div>
+            <div class="form-group">
+                <label data-i18n="clanIcon">Icon</label>
+                <div class="clan-icon-selector">
+                    <div class="clan-icon-option">🛡️</div>
+                    <div class="clan-icon-option">⚔️</div>
+                    <div class="clan-icon-option">🏹</div>
+                    <div class="clan-icon-option">🔮</div>
+                    <div class="clan-icon-option">🏰</div>
+                    <div class="clan-icon-option">🐉</div>
+                    <div class="clan-icon-option">🌙</div>
+                    <div class="clan-icon-option">🌟</div>
+                </div>
+            </div>
+            <div class="form-group">
+                <p class="create-clan-cost" data-i18n="createClanCost">Cost: 1000 $INSOMNIA</p>
+            </div>
+            <button class="create-clan-confirm" id="create-clan-confirm" data-i18n="createClan">Create Clan</button>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <div class="header">
+        <div class="header-content">
+            <h1 data-i18n="title">Insomnia Clicker <span id="premium-badge" class="premium-badge" style="display:none;" data-i18n="premiumBadge">PREMIUM</span></h1>
+            <p data-i18n="balance">Balance: <span id="balance">0</span> $INSOMNIA</p>
+            <div id="time-left" style="display:none;"></div>
+        </div>
+        
+        <button class="settings-btn" id="settings-btn" aria-label="Settings">🌎</button>
+        <div class="settings-menu" id="settings-menu">
+            <div class="settings-menu-item" id="language-btn">
+                <i>🌐</i> <span data-i18n="language">Language</span>
+            </div>
+            <div class="language-menu" id="language-menu">
+                <div class="language-option" data-lang="en">English</div>
+                <div class="language-option" data-lang="ru">Русский</div>
+                <div class="language-option" data-lang="es">Español</div>
+                <div class="language-option" data-lang="fr">Français</div>
+                <div class="language-option" data-lang="de">Deutsch</div>
+                <div class="language-option" data-lang="zh">中文</div>
+                <div class="language-option" data-lang="ja">日本語</div>
+                <div class="language-option" data-lang="ko">한국어</div>
+            </div>
+            <div class="settings-menu-item" id="privacy-btn">
+                <i>🔒</i> <span data-i18n="privacy">Privacy Policy</span>
+            </div>
+            <div class="settings-menu-item" id="support-btn">
+                <i>💬</i> <span data-i18n="support">Support</span>
+            </div>
+            <div class="settings-menu-item" id="reset-progress">
+                <i>🔄</i> <span data-i18n="resetProgress">Reset Progress</span>
+            </div>
+            <div class="settings-menu-item" id="change-emoji-btn" style="display:none;">
+                <i>✨</i> <span data-i18n="changeEmoji">Change Button Emoji</span>
+            </div>
+            <div class="settings-menu-item" id="change-bg-emoji-btn" style="display:none;">
+                <i>🌌</i> <span data-i18n="changeBgEmoji">Change BG Emoji</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <!-- Clicker -->
+        <div id="click-tab" class="tab-content active">
+            <div class="progress-container">
+                <div id="progress-bar" class="progress-bar"></div>
+            </div>
+            <div id="clicks-left" data-i18n="clicksLeft">Clicks left: 200/200</div>
+            <div id="regen-info" data-i18n="regenInfo">Ready! Maximum clicks</div>
+            <div id="click-area" aria-label="Click to earn coins">INSOMNIA</div>
+            <button id="buy-premium" data-i18n="buyPremium">Buy PREMIUM</button>
+        </div>
+
+        <!-- Friends -->
+        <div id="friends-tab" class="tab-content">
+            <h3 data-i18n="referralTitle">Referral System</h3>
+            <p id="ref-bonus-text" data-i18n="refBonusText">Get +100 $INSOMNIA for each friend!</p>
+            <div id="ref-link" class="ref-link-container" data-i18n="copyRefLink">
+                Copy referral link
+            </div>
+            <div id="ref-stats">
+                <span data-i18n="invitedFriends">Invited</span>: <span id="ref-count">0</span> <span data-i18n="friends">friends</span> | 
+                <span data-i18n="earned">Earned</span>: <span id="ref-earned">0</span> $INSOMNIA
+            </div>
+        </div>
+
+        <!-- Wallet -->
+        <div id="wallet-tab" class="tab-content">
+            <h3 data-i18n="walletTitle">Wallet Connection</h3>
+            <div class="wallet-option" id="telegram-wallet-connect">
+                <img src="https://web.telegram.org/favicon.ico" width="25" alt="Telegram Wallet">
+                Connect Telegram
+            </div>
+            <div id="wallet-info" class="wallet-info" style="display:none;">
+                <p><span data-i18n="connected">Connected</span>: <span id="wallet-address">0x...0000</span></p>
+                <p><span data-i18n="network">Network</span>: <span id="wallet-network">-</span></p>
+            </div>
+        </div>
+
+        <!-- Quests -->
+        <div id="quests-tab" class="tab-content">
+            <h3 data-i18n="questsTitle">Quests</h3>
+            
+            <div class="daily-rewards">
+                <div class="daily-rewards-title" data-i18n="dailyRewards">Daily Rewards</div>
+                <div class="rewards-container">
+                    <div class="reward-day" id="day1">25</div>
+                    <div class="reward-day" id="day2">50</div>
+                    <div class="reward-day" id="day3">75</div>
+                    <div class="reward-day" id="day4">100</div>
+                    <div class="reward-day" id="day5">125</div>
+                    <div class="reward-day" id="day6">150</div>
+                    <div class="reward-day" id="day7">175</div>
+                </div>
+                <div class="next-reward-time" id="next-reward-time" data-i18n="nextRewardTime">Next reward in: 23h 59m</div>
+            </div>
+            
+            <div class="quest-item" id="telegram-quest">
+                <div>
+                    <div class="quest-title" data-i18n="telegramQuestTitle">Subscribe to Telegram channel</div>
+                    <div class="quest-description" data-i18n="telegramQuestDesc">Subscribe to our channel and get 100 $INSOMNIA</div>
+                </div>
+                <div class="quest-reward">+100 $INSOMNIA</div>
+            </div>
+            
+            <div class="quest-item" id="click-quest">
+                <div>
+                    <div class="quest-title" data-i18n="clickQuestTitle">Make 100 clicks</div>
+                    <div class="quest-description" data-i18n="clickQuestDesc">Click 100 times and get 100 $INSOMNIA</div>
+                </div>
+                <div class="quest-reward">+100 $INSOMNIA</div>
+            </div>
+            
+            <div class="quest-item" id="premium-quest">
+                <div>
+                    <div class="quest-title" data-i18n="premiumQuestTitle">Activate PREMIUM</div>
+                    <div class="quest-description" data-i18n="premiumQuestDesc">Activate PREMIUM subscription and get 1000 $INSOMNIA</div>
+                </div>
+                <div class="quest-reward">+1000 $INSOMNIA</div>
+            </div>
+            
+            <div class="quest-item" id="clan-quest">
+                <div>
+                    <div class="quest-title" data-i18n="clanQuestTitle">Join a clan</div>
+                    <div class="quest-description" data-i18n="clanQuestDesc">Join or create a clan and get 200 $INSOMNIA</div>
+                </div>
+                <div class="quest-reward">+200 $INSOMNIA</div>
+            </div>
+        </div>
+        
+        <!-- Clans -->
+        <div id="clans-tab" class="tab-content">
+            <div class="clan-tab-content" id="my-clan-tab" style="display: none;">
+                <h3 id="my-clan-name">My Clan</h3>
+                <div class="clan-stats">
+                    <div class="stat-item">
+                        <div class="stat-value" id="my-clan-members">1/20</div>
+                        <div class="stat-label" data-i18n="clanMembers">Members</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="my-clan-level">1</div>
+                        <div class="stat-label" data-i18n="clanLevel">Level</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="my-clan-rank">-</div>
+                        <div class="stat-label" data-i18n="clanRank">Rank</div>
+                    </div>
+                </div>
+                <div class="clan-description" id="my-clan-description"></div>
+                <button class="view-clan-btn" id="view-clan-btn" data-i18n="viewClan">View Clan</button>
+                <button class="leave-clan-btn" id="leave-clan-btn" data-i18n="leaveClan">Leave Clan</button>
+            </div>
+            
+            <div class="clan-tab-content" id="no-clan-tab">
+                <h3 data-i18n="noClan">You're not in a clan</h3>
+                <p data-i18n="clanBenefits">Join or create a clan to get bonuses and compete with others!</p>
+                <button class="create-clan-btn" id="create-clan-tab-btn" data-i18n="createClan">Create Clan</button>
+                <button class="join-clan-btn" id="join-clan-tab-btn" data-i18n="joinClan">Join Clan</button>
+            </div>
+            
+            <div class="top-clans">
+                <h3 data-i18n="topClans">Top Clans</h3>
+                <div class="top-clans-list" id="top-clans-list">
+                    <!-- Top clans will be added via JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+        <div class="nav-tab active" data-tab="click-tab" role="button" data-i18n="clickerTab">Clicker</div>
+        <div class="nav-tab" data-tab="quests-tab" role="button" data-i18n="questsTab">Quests</div>
+        <div class="nav-tab" data-tab="clans-tab" role="button" data-i18n="clansTab">Clans</div>
+        <div class="nav-tab" data-tab="friends-tab" role="button" data-i18n="friendsTab">Friends</div>
+        <div class="nav-tab" data-tab="wallet-tab" role="button" data-i18n="walletTab">Wallet</div>
+    </div>
+
+    <!-- Premium Modal -->
+    <div id="premium-modal" role="dialog" aria-modal="true" aria-labelledby="premium-modal-title">
+        <div class="premium-options">
+            <h2 id="premium-modal-title" data-i18n="premiumTitle">PREMIUM Subscription</h2>
+            <div id="premium-time-info" style="margin-bottom:12px;"></div>
+            
+            <div class="premium-feature" data-i18n="premiumFeature1">2X coins per click</div>
+            <div class="premium-feature" data-i18n="premiumFeature2">2X coins for referrals</div>
+            <div class="premium-feature" data-i18n="premiumFeature3">Unlimited clicks</div>
+            <div class="premium-feature" data-i18n="premiumFeature4">🎨 Button and background color selection</div>
+            <div class="premium-feature" data-i18n="premiumFeature5">2X daily rewards</div>
+            <div class="premium-feature" data-i18n="premiumFeature6">✨ Custom button emoji</div>
+            <div class="premium-feature" data-i18n="premiumFeature7">🌌 Custom background emoji</div>
+            <div class="premium-feature" data-i18n="premiumFeature8">💎 Exclusive background</div>
+            
+            <h3 data-i18n="chooseButtonColor">Choose button color:</h3>
+            <div>
+                <div class="color-option selected" style="background: linear-gradient(45deg, #6e45e2, #88d3ce);" data-color1="#6e45e2" data-color2="#88d3ce" aria-label="Purple-blue gradient"></div>
+                <div class="color-option" style="background: linear-gradient(45deg, #FF416C, #FF4B2B);" data-color1="#FF416C" data-color2="#FF4B2B" aria-label="Red-orange gradient"></div>
+                <div class="color-option" style="background: linear-gradient(45deg, #3a7bd5, #00d2ff);" data-color1="#3a7bd5" data-color2="#00d2ff" aria-label="Blue-cyan gradient"></div>
+                <div class="color-option" style="background: linear-gradient(45deg, #11998e, #38ef7d);" data-color1="#11998e" data-color2="#38ef7d" aria-label="Green-teal gradient"></div>
+                <div class="color-option" style="background: linear-gradient(45deg, #fc4a1a, #f7b733);" data-color1="#fc4a1a" data-color2="#f7b733" aria-label="Orange-yellow gradient"></div>
+            </div>
+            
+            <h3 data-i18n="chooseBgColor">Choose background color:</h3>
+            <div>
+                <div class="color-option selected" style="background: #1a1a2e;" data-bg="#1a1a2e" aria-label="Dark blue background"></div>
+                <div class="color-option" style="background: #0a0a1a;" data-bg="#0a0a1a" aria-label="Black-blue background"></div>
+                <div class="color-option" style="background: #121230;" data-bg="#121230" aria-label="Blue background"></div>
+                <div class="color-option" style="background: #1e3c72;" data-bg="#1e3c72" aria-label="Dark cyan background"></div>
+                <div class="color-option" style="background: #2c3e50;" data-bg="#2c3e50" aria-label="Gray-blue background"></div>
+            </div>
+            
+            <h3 data-i18n="chooseProgressColor">Choose progress bar color:</h3>
+            <div>
+                <div class="color-option" style="background: linear-gradient(90deg, #6e45e2, #88d3ce);" data-progress1="#6e45e2" data-progress2="#88d3ce" aria-label="Purple-blue gradient"></div>
+                <div class="color-option" style="background: linear-gradient(90deg, #FF416C, #FF4B2B);" data-progress1="#FF416C" data-progress2="#FF4B2B" aria-label="Red-orange gradient"></div>
+                <div class="color-option" style="background: linear-gradient(90deg, #3a7bd5, #00d2ff);" data-progress1="#3a7bd5" data-progress2="#00d2ff" aria-label="Blue-cyan gradient"></div>
+                <div class="color-option" style="background: linear-gradient(90deg, #11998e, #38ef7d);" data-progress1="#11998e" data-progress2="#38ef7d" aria-label="Green-teal gradient"></div>
+            </div>
+            
+            <div id="payment-options">
+                <h3 data-i18n="paymentMethods">Payment methods:</h3>
+                <button id="pay-telegram" class="wallet-option" style="margin: 10px 0;">
+                    <img src="https://web.telegram.org/favicon.ico" width="25" alt="Telegram">
+                    Pay with Telegram Stars
+                </button>
+            </div>
+            
+            <div id="telegram-payment" style="display: none;">
+                <div class="wallet-address" data-i18n="paymentWallet">
+                    For payment via Telegram Stars click the button below:
+                </div>
+                <button id="init-telegram-payment" style="margin-top:15px;">
+                    Pay 4.99 USDT via Telegram Stars
+                </button>
+                <p style="font-size:12px; margin-top:10px;">After payment you'll receive an exclusive link to activate PREMIUM</p>
+            </div>
+            
+            <button id="close-premium-modal" style="margin-top:8px;" data-i18n="close">
+                Close
+            </button>
+        </div>
+    </div>
+
+    <!-- Privacy Modal -->
+    <div id="privacy-modal">
+        <div class="privacy-content">
+            <h2 data-i18n="privacyTitle">Insomnia Clicker Privacy Policy</h2>
+            
+            <p data-i18n="privacyIntro">This Privacy Policy describes how your information is collected, used and protected when using our Insomnia Clicker application.</p>
+            
+            <h3 data-i18n="dataCollection">1. Data collection</h3>
+            <p data-i18n="dataCollectionText">The Insomnia Clicker app collects the following data:</p>
+            <ul>
+                <li data-i18n="data1">Locally stored data about your game progress (balance, number of clicks, referrals)</li>
+                <li data-i18n="data2">Information about connected wallets (if you choose to connect)</li>
+                <li data-i18n="data3">Anonymous usage statistics to improve the app</li>
+            </ul>
+            
+            <h3 data-i18n="dataUsage">2. Data usage</h3>
+            <p data-i18n="dataUsageText">The collected data is used for:</p>
+            <ul>
+                <li data-i18n="usage1">Providing game functionality</li>
+                <li data-i18n="usage2">Improving user experience</li>
+                <li data-i18n="usage3">Analyzing the effectiveness of application features</li>
+            </ul>
+            
+            <h3 data-i18n="dataStorage">3. Data storage</h3>
+            <p data-i18n="dataStorageText">All game data is stored locally in your browser. You can reset progress at any time in the settings.</p>
+            
+            <h3 data-i18n="thirdParty">4. Third parties</h3>
+            <p data-i18n="thirdPartyText">The application may integrate with the following services:</p>
+            <ul>
+                <li data-i18n="service1">Telegram Wallet</li>
+                <li data-i18n="service2">Analytics services for collecting anonymous statistics</li>
+            </ul>
+            
+            <h3 data-i18n="changes">5. Policy changes</h3>
+            <p data-i18n="changesText">We reserve the right to update this Privacy Policy. All changes will be reflected in this document.</p>
+            
+            <button class="close-privacy" id="close-privacy" data-i18n="understand">I understand</button>
+        </div>
+    </div>
+
+    <!-- Emoji Selector -->
+    <div class="emoji-selector" id="emoji-selector">
+        <div class="emoji-option">🌙</div>
+        <div class="emoji-option">✨</div>
+        <div class="emoji-option">🌟</div>
+        <div class="emoji-option">💫</div>
+        <div class="emoji-option">🌠</div>
+        <div class="emoji-option">🌌</div>
+        <div class="emoji-option">🌃</div>
+        <div class="emoji-option">🌄</div>
+        <div class="emoji-option">🌅</div>
+        <div class="emoji-option">🌆</div>
+        <div class="emoji-option">🌇</div>
+        <div class="emoji-option">🪐</div>
+        <div class="emoji-option">☄️</div>
+        <div class="emoji-option">☀️</div>
+        <div class="emoji-option">🌝</div>
+        <div class="emoji-option">🌞</div>
+        <div class="emoji-option">🦊</div>
+        <div class="emoji-option">🐺</div>
+        <div class="emoji-option">🦉</div>
+        <div class="emoji-option">🦇</div>
+        <div class="emoji-option">👑</div>
+        <div class="emoji-option">💎</div>
+        <div class="emoji-option">🔮</div>
+        <div class="emoji-option">🎭</div>
+    </div>
+
+    <!-- BG Emoji Selector -->
+    <div class="bg-emoji-selector" id="bg-emoji-selector">
+        <div class="bg-emoji-option">⭐</div>
+        <div class="bg-emoji-option">🌟</div>
+        <div class="bg-emoji-option">✨</div>
+        <div class="bg-emoji-option">💫</div>
+        <div class="bg-emoji-option">🌠</div>
+        <div class="bg-emoji-option">🌌</div>
+        <div class="bg-emoji-option">🌃</div>
+        <div class="bg-emoji-option">🌄</div>
+        <div class="bg-emoji-option">🌅</div>
+        <div class="bg-emoji-option">🌆</div>
+        <div class="bg-emoji-option">🌇</div>
+        <div class="bg-emoji-option">🪐</div>
+        <div class="bg-emoji-option">☄️</div>
+        <div class="bg-emoji-option">☀️</div>
+        <div class="bg-emoji-option">🌝</div>
+        <div class="bg-emoji-option">🌞</div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toast" class="toast"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
