@@ -1,7 +1,4 @@
 // Game State
-// При загрузке
-const savedTheme = localStorage.getItem('theme') || 'dark';
-document.documentElement.setAttribute('data-theme', savedTheme);
 const gameState = {
     coins: parseInt(localStorage.getItem('insomniaCoins')) || 0,
     clickPower: 1,
@@ -1081,48 +1078,7 @@ function applySavedColors() {
 }
 
 // Handle Click
-function handleClick(event) {// Добавлено в handleClick()
-    // Анимация "всплеска" монет
-    createCoinExplosion(event.clientX, event.clientY, coinsEarned);
-    
-    // Анимация тряски экрана при большом доходе
-    if (coinsEarned >= 10) {
-        document.body.classList.add('screen-shake');
-        setTimeout(() => {
-            document.body.classList.remove('screen-shake');
-        }, 300);
-    }
-}
-
-// Новая функция: взрыв монет
-function createCoinExplosion(x, y, count) {
-    for (let i = 0; i < Math.min(count, 20); i++) {
-        setTimeout(() => {
-            const coin = document.createElement('div');
-            coin.className = 'coin-particle';
-            coin.innerHTML = '🪙';
-            coin.style.left = `${x}px`;
-            coin.style.top = `${y}px`;
-            document.body.appendChild(coin);
-            
-            // Анимация полёта
-            const angle = Math.random() * Math.PI * 2;
-            const distance = 50 + Math.random() * 50;
-            const duration = 800 + Math.random() * 500;
-            
-            coin.animate([
-                { transform: `translate(0, 0) rotate(0deg)`, opacity: 1 },
-                { 
-                    transform: `translate(${Math.cos(angle) * distance}px, ${Math.sin(angle) * distance}px) rotate(360deg)`, 
-                    opacity: 0 
-                }
-            ], {
-                duration: duration,
-                easing: 'cubic-bezier(0.1, 0.8, 0.2, 1)'
-            }).onfinish = () => coin.remove();
-        }, i * 50);
-    }
-}
+function handleClick(event) {
     const now = Date.now();
     
     // Check click cooldown
