@@ -61,112 +61,6 @@ const gameState = {
             icon: '🦉',
             level: 3,
             description: 'We click all night long!',
-            members: [
-                { id: 'admin1', name: 'Admin', tag: '#00001', role: 'leader' },
-                { id: 'member1', name: 'Member1', tag: '#00002', role: 'member' },
-                { id: 'member2', name: 'Member2', tag: '#00003', role: 'member' }
-            ],
-            totalClicks: 12500,
-            created: Date.now() - 86400000 * 3 // 3 days ago
-        },
-        {
-            id: 'clan2',
-            name: 'Click Masters',
-            tag: 'CM',
-            icon: '👑',
-            level: 5,
-            description: 'The best clickers in the world!',
-            members: [
-                { id: 'admin2', name: 'Leader', tag: '#00004', role: 'leader' },
-                { id: 'member3', name: 'Pro1', tag: '#00005', role: 'co-leader' },
-                { id: 'member4', name: 'Pro2', tag: '#00006', role: 'member' },
-                { id: 'member5', name: 'Noob', tag: '#00007', role: 'member' }
-            ],
-            totalClicks: 25000,
-            created: Date.now() - 86400000 * 7 // 7 days ago
-        },
-        {
-            id: 'clan3',
-            name: 'Insomniacs',
-            tag: 'INS',
-            icon: '🌙',
-            level: 2,
-            description: 'We never sleep!',
-            members: [
-                { id: 'admin3', name: 'Boss', tag: '#00008', role: 'leader' },
-                { id: 'member6', name: 'Helper', tag: '#00009', role: 'member' }
-            ],
-            totalClicks: 7500,
-            created: Date.now() - 86400000 // 1 day ago
-        }
-    ],
-    myClan: JSON.parse(localStorage.getItem('myClan')) || null,
-    selectedFriend: null,
-    selectedClan: null
-};
-// Game State with all new features
-const gameState = {
-    coins: parseInt(localStorage.getItem('insomniaCoins')) || 0,
-    clickPower: 1,
-    refCount: parseInt(localStorage.getItem('refCount')) || 0,
-    refEarned: parseInt(localStorage.getItem('refEarned')) || 0,
-    REF_REWARD: 100,
-    premiumActive: localStorage.getItem('premiumActive') === 'true' || false,
-    premiumEndDate: localStorage.getItem('premiumEndDate'),
-    selectedButtonColor1: localStorage.getItem('buttonColor1') || "#6e45e2",
-    selectedButtonColor2: localStorage.getItem('buttonColor2') || "#88d3ce",
-    selectedBgColor: localStorage.getItem('bgColor') || "#1a1a2e",
-    selectedProgressColor1: localStorage.getItem('progressColor1') || "#6e45e2",
-    selectedProgressColor2: localStorage.getItem('progressColor2') || "#88d3ce",
-    MAX_CLICKS: 200,
-    clicksLeft: parseInt(localStorage.getItem('clicksLeft')) || 200,
-    regenStartTime: localStorage.getItem('regenStartTime') ? parseInt(localStorage.getItem('regenStartTime')) : Date.now(),
-    REGEN_RATE: 1, // 1 click per second
-    CLICK_DELAY: 300, // Delay before adding click in ms
-    timerInterval: null,
-    clickRefreshInterval: null,
-    lastClickTime: 0,
-    CLICK_COOLDOWN: 100, // Delay between clicks in ms
-    currentLanguage: localStorage.getItem('language') || 'en',
-    totalClicks: parseInt(localStorage.getItem('totalClicks')) || 0,
-    completedQuests: JSON.parse(localStorage.getItem('completedQuests')) || [],
-    paymentStatus: localStorage.getItem('paymentStatus') || 'not_started',
-    dailyRewards: JSON.parse(localStorage.getItem('dailyRewards')) || {
-        streak: 0,
-        lastClaimed: null,
-        claimedDays: []
-    },
-    customEmoji: localStorage.getItem('customEmoji') || '🌙',
-    bgEmoji: localStorage.getItem('bgEmoji') || '⭐',
-    playerName: localStorage.getItem('playerName') || 'Player',
-    playerTag: localStorage.getItem('playerTag') || '#' + generatePlayerId(),
-    playerLevel: parseInt(localStorage.getItem('playerLevel')) || 1,
-    playerXP: parseInt(localStorage.getItem('playerXP')) || 0,
-    achievements: JSON.parse(localStorage.getItem('achievements')) || {
-        firstClick: { unlocked: false, progress: 0, max: 1 },
-        hundredClicks: { unlocked: false, progress: 0, max: 100 },
-        thousandClicks: { unlocked: false, progress: 0, max: 1000 },
-        firstCoin: { unlocked: false, progress: 0, max: 1 },
-        hundredCoins: { unlocked: false, progress: 0, max: 100 },
-        thousandCoins: { unlocked: false, progress: 0, max: 1000 },
-        firstRef: { unlocked: false, progress: 0, max: 1 },
-        fiveRefs: { unlocked: false, progress: 0, max: 5 },
-        tenRefs: { unlocked: false, progress: 0, max: 10 },
-        firstQuest: { unlocked: false, progress: 0, max: 1 },
-        allQuests: { unlocked: false, progress: 0, max: 4 },
-        premium: { unlocked: false, progress: 0, max: 1 },
-        firstFriend: { unlocked: false, progress: 0, max: 1 },
-        joinClan: { unlocked: false, progress: 0, max: 1 }
-    },
-    friends: JSON.parse(localStorage.getItem('friends')) || [],
-    clans: JSON.parse(localStorage.getItem('clans')) || [
-        {
-            id: 'clan1',
-            name: 'Night Owls',
-            tag: 'NO',
-            icon: '🦉',
-            level: 3,
-            description: 'We click all night long!',
             privacy: 'open',
             members: [
                 { id: 'admin1', name: 'Admin', tag: '#00001', level: 5, role: 'leader' },
@@ -218,6 +112,7 @@ const gameState = {
     lastOfflineTime: localStorage.getItem('lastOfflineTime') || Date.now(),
     antiCheat: {
         lastClickTimestamp: 0,
+        clicksThisSecond: 0,
         maxClicksPerSecond: 20,
         maxCoinsPerHour: 10000
     }
@@ -232,350 +127,6 @@ const audioElements = {
     music: document.getElementById('bg-music')
 };
 
-// Play sound with volume control
-function playSound(sound, volume = 0.5) {
-    if (!gameState.soundEnabled) return;
-    
-    try {
-        audioElements[sound].currentTime = 0;
-        audioElements[sound].volume = volume;
-        audioElements[sound].play();
-    } catch (e) {
-        console.error("Error playing sound:", e);
-    }
-}
-
-// Toggle sound
-function toggleSound() {
-    gameState.soundEnabled = !gameState.soundEnabled;
-    localStorage.setItem('soundEnabled', gameState.soundEnabled);
-    
-    const soundToggle = document.getElementById('sound-toggle');
-    if (soundToggle) {
-        soundToggle.innerHTML = `<i>${gameState.soundEnabled ? '🔊' : '🔇'}</i> <span data-i18n="soundToggle">Sound: ${gameState.soundEnabled ? 'ON' : 'OFF'}</span>`;
-        translatePage(gameState.currentLanguage);
-    }
-    
-    showToast(`Sound ${gameState.soundEnabled ? 'enabled' : 'disabled'}`);
-}
-
-// Toggle music
-function toggleMusic() {
-    gameState.musicEnabled = !gameState.musicEnabled;
-    localStorage.setItem('musicEnabled', gameState.musicEnabled);
-    
-    if (gameState.musicEnabled) {
-        audioElements.music.volume = 0.3;
-        audioElements.music.play().catch(e => console.log("Audio play failed:", e));
-    } else {
-        audioElements.music.pause();
-    }
-    
-    showToast(`Music ${gameState.musicEnabled ? 'enabled' : 'disabled'}`);
-}
-
-// Toggle theme
-function toggleTheme() {
-    gameState.theme = gameState.theme === 'dark' ? 'light' : 'dark';
-    localStorage.setItem('theme', gameState.theme);
-    applyTheme();
-}
-
-// Apply current theme
-function applyTheme() {
-    document.body.className = `${gameState.theme}-theme`;
-}
-
-// Calculate offline earnings
-function calculateOfflineEarnings() {
-    if (!gameState.lastOfflineTime) return;
-    
-    const now = Date.now();
-    const offlineTime = Math.min((now - gameState.lastOfflineTime) / 1000, 86400); // Max 24 hours
-    const offlineHours = offlineTime / 3600;
-    
-    if (offlineHours < 0.1) return; // Less than 6 minutes
-    
-    // Calculate earnings based on click rate and power
-    const clicksPerHour = gameState.premiumActive ? 1000 : 500; // Estimated clicks per hour
-    const earnings = Math.floor(clicksPerHour * offlineHours * gameState.clickPower * 0.8); // 80% of normal rate
-    
-    if (earnings > 0) {
-        gameState.coins += earnings;
-        updateBalance();
-        
-        const hours = Math.floor(offlineHours);
-        const minutes = Math.floor((offlineHours % 1) * 60);
-        
-        showToast(`While you were away (${hours}h ${minutes}m), you earned ${earnings} $INSOMNIA!`);
-    }
-    
-    gameState.lastOfflineTime = now;
-    localStorage.setItem('lastOfflineTime', gameState.lastOfflineTime);
-}
-
-// Anti-cheat system
-function checkAntiCheat() {
-    const now = Date.now();
-    const timeSinceLastClick = now - gameState.antiCheat.lastClickTimestamp;
-    
-    // Reset if more than 1 second passed
-    if (timeSinceLastClick > 1000) {
-        gameState.antiCheat.lastClickTimestamp = now;
-        return true;
-    }
-    
-    // Check click rate
-    if (gameState.antiCheat.clicksThisSecond > gameState.antiCheat.maxClicksPerSecond) {
-        console.warn("Anti-cheat: Click rate too high");
-        return false;
-    }
-    
-    gameState.antiCheat.lastClickTimestamp = now;
-    return true;
-}
-
-// [Previous helper functions remain the same, with additions below]
-
-// Update Clan Settings
-function updateClanSettings() {
-    if (!gameState.myClan) return;
-    
-    // Check if player is clan leader
-    const playerMember = gameState.myClan.members.find(m => m.id === 'player_' + gameState.playerTag);
-    if (playerMember && playerMember.role === 'leader') {
-        elements.clanSettingsBtn.style.display = 'block';
-    } else {
-        elements.clanSettingsBtn.style.display = 'none';
-    }
-}
-
-// Show Clan Settings
-function showClanSettings() {
-    if (!gameState.myClan) return;
-    
-    elements.clanDescriptionEdit.value = gameState.myClan.description || '';
-    elements.clanPrivacyEdit.value = gameState.myClan.privacy || 'open';
-    
-    // Select current icon
-    document.querySelectorAll('#clan-settings-popup .clan-icon-option').forEach(option => {
-        option.classList.remove('selected');
-        if (option.textContent === gameState.myClan.icon) {
-            option.classList.add('selected');
-        }
-    });
-    
-    elements.clanSettingsPopup.classList.add('active');
-}
-
-// Save Clan Settings
-function saveClanSettings() {
-    if (!gameState.myClan) return;
-    
-    gameState.myClan.description = elements.clanDescriptionEdit.value;
-    gameState.myClan.privacy = elements.clanPrivacyEdit.value;
-    
-    // Get selected icon
-    const selectedIconOption = document.querySelector('#clan-settings-popup .clan-icon-option.selected');
-    if (selectedIconOption) {
-        gameState.myClan.icon = selectedIconOption.textContent;
-    }
-    
-    // Update in clans list
-    const clanIndex = gameState.clans.findIndex(c => c.id === gameState.myClan.id);
-    if (clanIndex !== -1) {
-        gameState.clans[clanIndex] = gameState.myClan;
-    }
-    
-    localStorage.setItem('myClan', JSON.stringify(gameState.myClan));
-    localStorage.setItem('clans', JSON.stringify(gameState.clans));
-    
-    elements.clanSettingsPopup.classList.remove('active');
-    updateClanInfo();
-    updateTopClansList();
-    
-    showToast("Clan settings updated!");
-}
-
-// Add Friend by ID
-function addFriendById() {
-    const friendId = elements.friendIdInput.value.trim();
-    if (!friendId) return;
-    
-    // In a real app, this would search for the friend by ID
-    // For demo purposes, we'll simulate finding a friend
-    
-    // Check if already friends
-    if (gameState.friends.some(f => f.tag === friendId)) {
-        showToast("You're already friends with this player");
-        return;
-    }
-    
-    // Simulate finding a friend
-    const newFriend = {
-        id: 'friend_' + Date.now(),
-        name: "Friend_" + Math.floor(Math.random() * 1000),
-        tag: friendId,
-        level: Math.floor(1 + Math.random() * 10),
-        clicks: Math.floor(Math.random() * 5000),
-        coins: Math.floor(Math.random() * 10000),
-        clan: Math.random() > 0.5 ? 'Night Owls' : null
-    };
-    
-    gameState.friends.push(newFriend);
-    localStorage.setItem('friends', JSON.stringify(gameState.friends));
-    
-    elements.friendIdInput.value = '';
-    updateFriendsList();
-    checkAchievements();
-    
-    showToast("Friend added successfully!");
-}
-
-// [Previous initialization code remains the same, with additions below]
-
-// Initialize the game with all new features
-function initGame() {
-    // Apply theme
-    applyTheme();
-    
-    // Calculate offline earnings
-    calculateOfflineEarnings();
-    
-    // Start background music if enabled
-    if (gameState.musicEnabled) {
-        audioElements.music.volume = 0.3;
-        audioElements.music.play().catch(e => console.log("Audio play failed:", e));
-    }
-    
-    // [Previous initialization code remains the same]
-    
-    // Add new event listeners
-    elements.soundToggle.addEventListener('click', toggleSound);
-    elements.clanSettingsBtn.addEventListener('click', showClanSettings);
-    elements.closeClanSettings.addEventListener('click', () => {
-        elements.clanSettingsPopup.classList.remove('active');
-    });
-    elements.saveClanSettings.addEventListener('click', saveClanSettings);
-    elements.addFriendBtn.addEventListener('click', addFriendById);
-    
-    // Update sound toggle display
-    const soundToggle = document.getElementById('sound-toggle');
-    if (soundToggle) {
-        soundToggle.innerHTML = `<i>${gameState.soundEnabled ? '🔊' : '🔇'}</i> <span data-i18n="soundToggle">Sound: ${gameState.soundEnabled ? 'ON' : 'OFF'}</span>`;
-    }
-    
-    // Update clan settings button visibility
-    updateClanSettings();
-    
-    // Initialize anti-cheat
-    gameState.antiCheat.lastClickTimestamp = Date.now();
-    gameState.antiCheat.clicksThisSecond = 0;
-    
-    setInterval(() => {
-        gameState.antiCheat.clicksThisSecond = 0;
-    }, 1000);
-}
-
-// [Rest of the previous code remains the same]
-
-// Handle Click with sound and anti-cheat
-function handleClick(event) {
-    const now = Date.now();
-    
-    // Anti-cheat check
-    if (!checkAntiCheat()) {
-        playSound('error');
-        return;
-    }
-    
-    gameState.antiCheat.clicksThisSecond++;
-    
-    // Check click cooldown
-    if (now - gameState.lastClickTime < gameState.CLICK_COOLDOWN) return;
-    gameState.lastClickTime = now;
-    
-    // Check if clicks are available
-    if (!gameState.premiumActive && gameState.clicksLeft <= 0) {
-        playSound('error');
-        return;
-    }
-    
-    // Decrease clicks left if not premium
-    if (!gameState.premiumActive) {
-        gameState.clicksLeft--;
-        updateClicksCounter();
-    }
-    
-    // Calculate coins earned
-    const coinsEarned = gameState.clickPower;
-    gameState.coins += coinsEarned;
-    gameState.totalClicks++;
-    
-    // Update UI
-    updateBalance();
-    animateClick();
-    
-    // Play sounds
-    playSound('click');
-    if (coinsEarned > 1) {
-        playSound('coin', 0.3);
-    }
-    
-    // Create effects
-    createEmojiEffect(event.clientX, event.clientY);
-    createCoinEffect(event.clientX, event.clientY, coinsEarned);
-    
-    // Save state
-    localStorage.setItem('totalClicks', gameState.totalClicks);
-    localStorage.setItem('regenStartTime', Date.now());
-    
-    // Check achievements
-    checkAchievements();
-    checkClickQuest();
-    
-    // Update clan stats if in a clan
-    if (gameState.myClan) {
-        gameState.myClan.totalClicks = (gameState.myClan.totalClicks || 0) + 1;
-        localStorage.setItem('myClan', JSON.stringify(gameState.myClan));
-        
-        // Update clan in the clans list
-        const clanIndex = gameState.clans.findIndex(c => c.id === gameState.myClan.id);
-        if (clanIndex !== -1) {
-            gameState.clans[clanIndex].totalClicks = gameState.myClan.totalClicks;
-            localStorage.setItem('clans', JSON.stringify(gameState.clans));
-        }
-    }
-}
-
-// Activate Premium with sound
-function activatePremium() {
-    gameState.premiumActive = true;
-    localStorage.setItem('premiumActive', 'true');
-    gameState.clickPower = 2;
-    elements.premiumBadge.style.display = "inline";
-    elements.refBonusText.textContent = translations[gameState.currentLanguage]['refBonusTextPremium'];
-    elements.buyPremiumBtn.textContent = translations[gameState.currentLanguage]['premiumActive'];
-    elements.buyPremiumBtn.classList.add('premium-btn');
-    elements.timeLeft.style.display = "block";
-    elements.regenInfo.textContent = translations[gameState.currentLanguage]['unlimitedClicks'];
-    elements.changeEmojiBtn.style.display = "block";
-    elements.changeBgEmojiBtn.style.display = "block";
-    
-    gameState.clicksLeft = Infinity;
-    updateClicksCounter();
-    
-    applySavedColors();
-    document.body.classList.add('premium-bg');
-    updateBgEmoji();
-    
-    playSound('premium');
-    showToast(translations[gameState.currentLanguage]['premiumActivated']);
-    checkPremiumQuest();
-    checkAchievements();
-}
-
-// [Rest of the previous code remains the same]
 // Generate unique player ID
 function generatePlayerId() {
     let playerId = localStorage.getItem('playerId');
@@ -785,7 +336,9 @@ const translations = {
         notEnoughCoins: "Not enough coins!",
         friendAdded: "Friend added!",
         friendRemoved: "Friend removed",
-        giftSent: "Gift sent! +50 $INSOMNIA to your friend"
+        giftSent: "Gift sent! +50 $INSOMNIA to your friend",
+        soundToggle: "Sound: ON",
+        achievementUnlocked: "Achievement unlocked"
     },
     ru: {
         title: "Insomnia Clicker",
@@ -974,7 +527,9 @@ const translations = {
         notEnoughCoins: "Недостаточно монет!",
         friendAdded: "Друг добавлен!",
         friendRemoved: "Друг удалён",
-        giftSent: "Подарок отправлен! +50 $INSOMNIA вашему другу"
+        giftSent: "Подарок отправлен! +50 $INSOMNIA вашему другу",
+        soundToggle: "Звук: ВКЛ",
+        achievementUnlocked: "Достижение разблокировано"
     }
 };
 
@@ -1091,7 +646,15 @@ const elements = {
     leaveClanBtn: document.getElementById('leave-clan-btn'),
     createClanTabBtn: document.getElementById('create-clan-tab-btn'),
     joinClanTabBtn: document.getElementById('join-clan-tab-btn'),
-    topClansList: document.getElementById('top-clans-list')
+    topClansList: document.getElementById('top-clans-list'),
+    soundToggle: document.getElementById('sound-toggle'),
+    clanSettingsBtn: document.getElementById('clan-settings-btn'),
+    clanSettingsPopup: document.getElementById('clan-settings-popup'),
+    closeClanSettings: document.getElementById('close-clan-settings'),
+    saveClanSettings: document.getElementById('save-clan-settings'),
+    clanDescriptionEdit: document.getElementById('clan-description-edit'),
+    clanPrivacyEdit: document.getElementById('clan-privacy-edit'),
+    friendIdInput: document.getElementById('friend-id-input')
 };
 
 // Helper Functions
@@ -1139,6 +702,110 @@ function createCoinEffect(x, y, amount) {
     setTimeout(() => {
         coin.remove();
     }, 1000);
+}
+
+// Play sound with volume control
+function playSound(sound, volume = 0.5) {
+    if (!gameState.soundEnabled) return;
+    
+    try {
+        audioElements[sound].currentTime = 0;
+        audioElements[sound].volume = volume;
+        audioElements[sound].play();
+    } catch (e) {
+        console.error("Error playing sound:", e);
+    }
+}
+
+// Toggle sound
+function toggleSound() {
+    gameState.soundEnabled = !gameState.soundEnabled;
+    localStorage.setItem('soundEnabled', gameState.soundEnabled);
+    
+    const soundToggle = document.getElementById('sound-toggle');
+    if (soundToggle) {
+        soundToggle.innerHTML = `<i>${gameState.soundEnabled ? '🔊' : '🔇'}</i> <span data-i18n="soundToggle">Sound: ${gameState.soundEnabled ? 'ON' : 'OFF'}</span>`;
+        translatePage(gameState.currentLanguage);
+    }
+    
+    showToast(`Sound ${gameState.soundEnabled ? 'enabled' : 'disabled'}`);
+}
+
+// Toggle music
+function toggleMusic() {
+    gameState.musicEnabled = !gameState.musicEnabled;
+    localStorage.setItem('musicEnabled', gameState.musicEnabled);
+    
+    if (gameState.musicEnabled) {
+        audioElements.music.volume = 0.3;
+        audioElements.music.play().catch(e => console.log("Audio play failed:", e));
+    } else {
+        audioElements.music.pause();
+    }
+    
+    showToast(`Music ${gameState.musicEnabled ? 'enabled' : 'disabled'}`);
+}
+
+// Toggle theme
+function toggleTheme() {
+    gameState.theme = gameState.theme === 'dark' ? 'light' : 'dark';
+    localStorage.setItem('theme', gameState.theme);
+    applyTheme();
+}
+
+// Apply current theme
+function applyTheme() {
+    document.body.className = `${gameState.theme}-theme`;
+}
+
+// Calculate offline earnings
+function calculateOfflineEarnings() {
+    if (!gameState.lastOfflineTime) return;
+    
+    const now = Date.now();
+    const offlineTime = Math.min((now - gameState.lastOfflineTime) / 1000, 86400); // Max 24 hours
+    const offlineHours = offlineTime / 3600;
+    
+    if (offlineHours < 0.1) return; // Less than 6 minutes
+    
+    // Calculate earnings based on click rate and power
+    const clicksPerHour = gameState.premiumActive ? 1000 : 500; // Estimated clicks per hour
+    const earnings = Math.floor(clicksPerHour * offlineHours * gameState.clickPower * 0.8); // 80% of normal rate
+    
+    if (earnings > 0) {
+        gameState.coins += earnings;
+        updateBalance();
+        
+        const hours = Math.floor(offlineHours);
+        const minutes = Math.floor((offlineHours % 1) * 60);
+        
+        showToast(`While you were away (${hours}h ${minutes}m), you earned ${earnings} $INSOMNIA!`);
+    }
+    
+    gameState.lastOfflineTime = now;
+    localStorage.setItem('lastOfflineTime', gameState.lastOfflineTime);
+}
+
+// Anti-cheat system
+function checkAntiCheat() {
+    const now = Date.now();
+    const timeSinceLastClick = now - gameState.antiCheat.lastClickTimestamp;
+    
+    // Reset if more than 1 second passed
+    if (timeSinceLastClick > 1000) {
+        gameState.antiCheat.lastClickTimestamp = now;
+        gameState.antiCheat.clicksThisSecond = 1;
+        return true;
+    }
+    
+    // Check click rate
+    if (gameState.antiCheat.clicksThisSecond > gameState.antiCheat.maxClicksPerSecond) {
+        console.warn("Anti-cheat: Click rate too high");
+        return false;
+    }
+    
+    gameState.antiCheat.clicksThisSecond++;
+    return true;
 }
 
 // Translate the page
@@ -1416,6 +1083,7 @@ function activatePremium() {
     document.body.classList.add('premium-bg');
     updateBgEmoji();
     
+    playSound('premium');
     showToast(translations[gameState.currentLanguage]['premiumActivated']);
     checkPremiumQuest();
     checkAchievements();
@@ -1552,12 +1220,19 @@ function applySavedColors() {
 function handleClick(event) {
     const now = Date.now();
     
+    // Anti-cheat check
+    if (!checkAntiCheat()) {
+        playSound('error');
+        return;
+    }
+    
     // Check click cooldown
     if (now - gameState.lastClickTime < gameState.CLICK_COOLDOWN) return;
     gameState.lastClickTime = now;
     
     // Check if clicks are available
     if (!gameState.premiumActive && gameState.clicksLeft <= 0) {
+        playSound('error');
         return;
     }
     
@@ -1575,6 +1250,12 @@ function handleClick(event) {
     // Update UI
     updateBalance();
     animateClick();
+    
+    // Play sounds
+    playSound('click');
+    if (coinsEarned > 1) {
+        playSound('coin', 0.3);
+    }
     
     // Create effects
     createEmojiEffect(event.clientX, event.clientY);
@@ -1841,6 +1522,41 @@ function addFriend() {
     showToast(`${translations[gameState.currentLanguage]['friendAdded']}`);
 }
 
+// Add Friend by ID
+function addFriendById() {
+    const friendId = elements.friendIdInput.value.trim();
+    if (!friendId) return;
+    
+    // In a real app, this would search for the friend by ID
+    // For demo purposes, we'll simulate finding a friend
+    
+    // Check if already friends
+    if (gameState.friends.some(f => f.tag === friendId)) {
+        showToast("You're already friends with this player");
+        return;
+    }
+    
+    // Simulate finding a friend
+    const newFriend = {
+        id: 'friend_' + Date.now(),
+        name: "Friend_" + Math.floor(Math.random() * 1000),
+        tag: friendId,
+        level: Math.floor(1 + Math.random() * 10),
+        clicks: Math.floor(Math.random() * 5000),
+        coins: Math.floor(Math.random() * 10000),
+        clan: Math.random() > 0.5 ? 'Night Owls' : null
+    };
+    
+    gameState.friends.push(newFriend);
+    localStorage.setItem('friends', JSON.stringify(gameState.friends));
+    
+    elements.friendIdInput.value = '';
+    updateFriendsList();
+    checkAchievements();
+    
+    showToast("Friend added successfully!");
+}
+
 // Remove Friend
 function removeFriend() {
     if (!gameState.selectedFriend) return;
@@ -1999,6 +1715,66 @@ function showClanPopup(clan) {
     elements.clanPopup.classList.add('active');
 }
 
+// Update Clan Settings
+function updateClanSettings() {
+    if (!gameState.myClan) return;
+    
+    // Check if player is clan leader
+    const playerMember = gameState.myClan.members.find(m => m.id === 'player_' + gameState.playerTag);
+    if (playerMember && playerMember.role === 'leader') {
+        elements.clanSettingsBtn.style.display = 'block';
+    } else {
+        elements.clanSettingsBtn.style.display = 'none';
+    }
+}
+
+// Show Clan Settings
+function showClanSettings() {
+    if (!gameState.myClan) return;
+    
+    elements.clanDescriptionEdit.value = gameState.myClan.description || '';
+    elements.clanPrivacyEdit.value = gameState.myClan.privacy || 'open';
+    
+    // Select current icon
+    document.querySelectorAll('#clan-settings-popup .clan-icon-option').forEach(option => {
+        option.classList.remove('selected');
+        if (option.textContent === gameState.myClan.icon) {
+            option.classList.add('selected');
+        }
+    });
+    
+    elements.clanSettingsPopup.classList.add('active');
+}
+
+// Save Clan Settings
+function saveClanSettings() {
+    if (!gameState.myClan) return;
+    
+    gameState.myClan.description = elements.clanDescriptionEdit.value;
+    gameState.myClan.privacy = elements.clanPrivacyEdit.value;
+    
+    // Get selected icon
+    const selectedIconOption = document.querySelector('#clan-settings-popup .clan-icon-option.selected');
+    if (selectedIconOption) {
+        gameState.myClan.icon = selectedIconOption.textContent;
+    }
+    
+    // Update in clans list
+    const clanIndex = gameState.clans.findIndex(c => c.id === gameState.myClan.id);
+    if (clanIndex !== -1) {
+        gameState.clans[clanIndex] = gameState.myClan;
+    }
+    
+    localStorage.setItem('myClan', JSON.stringify(gameState.myClan));
+    localStorage.setItem('clans', JSON.stringify(gameState.clans));
+    
+    elements.clanSettingsPopup.classList.remove('active');
+    updateClanInfo();
+    updateTopClansList();
+    
+    showToast("Clan settings updated!");
+}
+
 // Join Clan
 function joinClan() {
     if (!gameState.selectedClan || gameState.myClan) return;
@@ -2108,6 +1884,7 @@ function createClan() {
         icon: icon,
         level: 1,
         description: description,
+        privacy: 'open',
         members: [{
             id: 'player_' + gameState.playerTag,
             name: gameState.playerName,
@@ -2139,6 +1916,18 @@ function createClan() {
 
 // Initialize the game
 function initGame() {
+    // Apply theme
+    applyTheme();
+    
+    // Calculate offline earnings
+    calculateOfflineEarnings();
+    
+    // Start background music if enabled
+    if (gameState.musicEnabled) {
+        audioElements.music.volume = 0.3;
+        audioElements.music.play().catch(e => console.log("Audio play failed:", e));
+    }
+    
     // Set up event listeners
     elements.clickArea.addEventListener('click', handleClick);
     
@@ -2375,6 +2164,19 @@ function initGame() {
         });
     });
     
+    // Sound toggle
+    elements.soundToggle.addEventListener('click', toggleSound);
+    
+    // Clan settings
+    elements.clanSettingsBtn.addEventListener('click', showClanSettings);
+    elements.closeClanSettings.addEventListener('click', () => {
+        elements.clanSettingsPopup.classList.remove('active');
+    });
+    elements.saveClanSettings.addEventListener('click', saveClanSettings);
+    
+    // Add friend by ID
+    elements.addFriendBtn.addEventListener('click', addFriendById);
+    
     // Initialize game state
     checkPremiumStatus();
     startClickRefresh();
@@ -2386,9 +2188,18 @@ function initGame() {
     updateFriendsList();
     updateClanInfo();
     updateTopClansList();
+    updateClanSettings();
     
     // Set click area emoji
     elements.clickArea.textContent = gameState.customEmoji;
+    
+    // Initialize anti-cheat
+    gameState.antiCheat.lastClickTimestamp = Date.now();
+    gameState.antiCheat.clicksThisSecond = 0;
+    
+    setInterval(() => {
+        gameState.antiCheat.clicksThisSecond = 0;
+    }, 1000);
     
     // Check if coming from referral
     const urlParams = new URLSearchParams(window.location.search);
@@ -2464,6 +2275,10 @@ function resetGame() {
     };
     gameState.friends = [];
     gameState.myClan = null;
+    gameState.soundEnabled = true;
+    gameState.musicEnabled = true;
+    gameState.theme = 'dark';
+    gameState.lastOfflineTime = Date.now();
     
     // Reset UI
     elements.premiumBadge.style.display = "none";
