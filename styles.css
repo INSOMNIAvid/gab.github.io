@@ -31,6 +31,32 @@ body {
     line-height: 1.6;
     background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 800 800"><g fill="rgba(255,255,255,0.1)"><circle cx="400" cy="400" r="1"/><circle cx="200" cy="200" r="1"/><circle cx="600" cy="600" r="1"/><circle cx="100" cy="300" r="1"/><circle cx="700" cy="500" r="1"/><circle cx="300" cy="100" r="1"/><circle cx="500" cy="700" r="1"/><circle cx="50" cy="600" r="1"/><circle cx="750" cy="200" r="1"/><circle cx="150" cy="700" r="1"/><circle cx="650" cy="100" r="1"/><circle cx="250" cy="500" r="1"/><circle cx="550" cy="300" r="1"/><circle cx="350" cy="650" r="1"/><circle cx="450" cy="150" r="1"/></g></svg>');
 }
+/* Gift amount styles */
+.gift-amount-container {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.gift-amount-container input {
+    flex: 1;
+    padding: 8px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(15, 52, 96, 0.7);
+    color: white;
+}
+
+/* Clan link styles */
+.clan-link {
+    color: var(--clan-color);
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.clan-link:hover {
+    color: #e68a00;
+}
 
 /* Header styles */
 .header {
