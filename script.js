@@ -117,6 +117,15 @@ const gameState = {
         maxCoinsPerHour: 10000
     }
 };
+function initGame() {
+    // ... existing code ...
+    
+    // Initialize new features
+    setupGiftSending();
+    updateClanMemberRoles();
+    
+    // ... rest of initialization ...
+}
 // Show clan in friend profile
 function updateFriendClanDisplay(clanName) {
     const clanElement = document.getElementById('friend-clan-name');
