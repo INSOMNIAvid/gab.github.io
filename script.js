@@ -117,7 +117,255 @@ const gameState = {
         maxCoinsPerHour: 10000
     }
 };
+// Show clan in friend profile
+function updateFriendClanDisplay(clanName) {
+    const clanElement = document.getElementById('friend-clan-name');
+    if (clanName) {
+        clanElement.innerHTML = `<span class="clan-link" id="view-friend-clan">${clanName}</span>`;
+        document.getElementById('view-friend-clan').addEventListener('click', () => {
+            const clan = gameState.clans.find(c => c.name === clanName);
+            if (clan) {
+                showClanPopup(clan);
+            }
+        });
+    } else {
+        clanElement.textContent = '-';
+    }
+}
 
+// Handle sending gifts
+function setupGiftSending() {
+    elements.sendGiftBtn.addEventListener('click', () => {
+        if (!gameState.premiumActive && gameState.coins < 1) {
+            showToast("You don't have enough coins to send a gift!");
+            return;
+        }
+
+        const giftContainer = document.getElementById('gift-amount-container');
+        giftContainer.style.display = giftContainer.style.display === 'flex' ? 'none' : 'flex';
+    });
+
+    document.getElementById('confirm-gift-btn').addEventListener('click', () => {
+        const amountInput = document.getElementById('gift-amount-input');
+        const amount = parseInt(amountInput.value);
+        
+        if (isNaN(amount) || amount < 1) {
+            showToast("Please enter a valid amount");
+            return;
+        }
+
+        // Check premium status and max amount
+        const maxAmount = gameState.premiumActive ? Infinity : 1000;
+        if (amount > maxAmount) {
+            showToast(`Non-premium players can only send up to 1000 $INSOMNIA`);
+            return;
+        }
+
+        if (amount > gameState.coins) {
+            showToast("You don't have enough coins!");
+            return;
+        }
+
+        // Deduct coins and send gift
+        gameState.coins -= amount;
+        updateBalance();
+        
+        document.getElementById('gift-amount-container').style.display = 'none';
+        amountInput.value = '';
+        
+        showToast(`Gift of ${amount} $INSOMNIA sent to ${gameState.selectedFriend.name}!`);
+    });
+}
+function showFriendProfile(friend) {
+    gameState.selectedFriend = friend;
+    
+    elements.friendProfileName.textContent = friend.name;
+    elements.friendProfileTag.textContent = friend.tag;
+    elements.friendProfileLevel.textContent = `Level ${friend.level || 1}`;
+    elements.friendProfileAvatar.textContent = friend.name.charAt(0).toUpperCase();
+    elements.friendStatClicks.textContent = friend.clicks || 0;
+    elements.friendStatCoins.textContent = friend.coins || 0;
+    
+    // Update clan display with clickable link
+    updateFriendClanDisplay(friend.clan);
+    
+    elements.friendProfilePopup.classList.add('active');
+}
+function joinClan() {
+    if (!gameState.selectedClan || gameState.myClan) return;
+    
+    // Check if clan is open or closed
+    if (gameState.selectedClan.privacy === 'closed') {
+        showToast("This clan is closed for public joining. You need an invite.");
+        return;
+    }
+    
+    // Add player to clan members
+    const playerMember = {
+        id: 'player_' + gameState.playerTag,
+        name: gameState.playerName,
+        tag: gameState.playerTag,
+        level: gameState.playerLevel,
+        role: 'member'
+    };
+    
+    gameState.selectedClan.members.push(playerMember);
+    gameState.myClan = gameState.selectedClan;
+    
+    // Update in clans list
+    const clanIndex = gameState.clans.findIndex(c => c.id === gameState.selectedClan.id);
+    if (clanIndex !== -1) {
+        gameState.clans[clanIndex] = gameState.selectedClan;
+    }
+    
+    localStorage.setItem('myClan', JSON.stringify(gameState.myClan));
+    localStorage.setItem('clans', JSON.stringify(gameState.clans));
+    
+    elements.clanPopup.classList.remove('active');
+    updateClanInfo();
+    updateTopClansList();
+    checkClanQuest();
+    checkAchievements();
+    
+    showToast(`${translations[gameState.currentLanguage]['clanJoined']}`);
+}
+function updateClanMemberRoles() {
+    if (!gameState.myClan) return;
+    
+    const playerMember = gameState.myClan.members.find(m => m.id === 'player_' + gameState.playerTag);
+    if (!playerMember) return;
+    
+    // Only show settings button for leader
+    elements.clanSettingsBtn.style.display = playerMember.role === 'leader' ? 'block' : 'none';
+    
+    // Update clan popup actions based on role
+    elements.clanActions.innerHTML = '';
+    
+    if (playerMember.role === 'leader') {
+        // Leader actions
+        const promoteBtn = document.createElement('button');
+        promoteBtn.className = 'clan-action-btn';
+        promoteBtn.textContent = 'Promote Member';
+        promoteBtn.addEventListener('click', showPromotionMenu);
+        elements.clanActions.appendChild(promoteBtn);
+        
+        const settingsBtn = document.createElement('button');
+        settingsBtn.className = 'clan-action-btn';
+        settingsBtn.textContent = 'Clan Settings';
+        settingsBtn.addEventListener('click', showClanSettings);
+        elements.clanActions.appendChild(settingsBtn);
+    }
+    
+    const leaveBtn = document.createElement('button');
+    leaveBtn.className = 'clan-action-btn danger';
+    leaveBtn.textContent = translations[gameState.currentLanguage]['leaveClan'];
+    leaveBtn.addEventListener('click', leaveClan);
+    elements.clanActions.appendChild(leaveBtn);
+}
+
+function showPromotionMenu() {
+    // Create promotion menu UI
+    const menu = document.createElement('div');
+    menu.className = 'promotion-menu';
+    menu.innerHTML = `
+        <h4>Manage Clan Members</h4>
+        <div class="member-list" id="promotion-member-list"></div>
+    `;
+    
+    // Add members to the list
+    const memberList = document.getElementById('promotion-member-list');
+    gameState.myClan.members.forEach(member => {
+        if (member.role === 'leader') return;
+        
+        const memberElement = document.createElement('div');
+        memberElement.className = 'promotion-member-item';
+        memberElement.innerHTML = `
+            <span>${member.name} (${member.role})</span>
+            <div class="promotion-actions">
+                ${member.role !== 'co-leader' ? '<button class="promote-btn">Promote</button>' : ''}
+                ${member.role === 'co-leader' ? '<button class="demote-btn">Demote</button>' : ''}
+                <button class="kick-btn">Kick</button>
+            </div>
+        `;
+        
+        memberElement.querySelector('.promote-btn')?.addEventListener('click', () => promoteMember(member.id));
+        memberElement.querySelector('.demote-btn')?.addEventListener('click', () => demoteMember(member.id));
+        memberElement.querySelector('.kick-btn')?.addEventListener('click', () => kickMember(member.id));
+        
+        memberList.appendChild(memberElement);
+    });
+    
+    // Show the menu
+    elements.clanActions.innerHTML = '';
+    elements.clanActions.appendChild(menu);
+}
+
+function promoteMember(memberId) {
+    const member = gameState.myClan.members.find(m => m.id === memberId);
+    if (member) {
+        member.role = 'co-leader';
+        saveClanChanges();
+        showToast("Member promoted to co-leader");
+    }
+}
+
+function demoteMember(memberId) {
+    const member = gameState.myClan.members.find(m => m.id === memberId);
+    if (member) {
+        member.role = 'member';
+        saveClanChanges();
+        showToast("Co-leader demoted to member");
+    }
+}
+
+function kickMember(memberId) {
+    if (confirm("Are you sure you want to kick this member?")) {
+        gameState.myClan.members = gameState.myClan.members.filter(m => m.id !== memberId);
+        saveClanChanges();
+        showToast("Member kicked from clan");
+    }
+}
+
+function saveClanChanges() {
+    localStorage.setItem('myClan', JSON.stringify(gameState.myClan));
+    
+    // Update in clans list
+    const clanIndex = gameState.clans.findIndex(c => c.id === gameState.myClan.id);
+    if (clanIndex !== -1) {
+        gameState.clans[clanIndex] = gameState.myClan;
+        localStorage.setItem('clans', JSON.stringify(gameState.clans));
+    }
+    
+    // Refresh UI
+    showClanPopup(gameState.myClan);
+}
+// In translations object
+{
+    // ... existing translations ...
+    sendGift: "Send Gift",
+    giftSent: "Gift sent! +{amount} $INSOMNIA to your friend",
+    maxGiftAmount: "Maximum gift amount for non-premium: 1000 $INSOMNIA",
+    clanLeader: "Leader",
+    clanCoLeader: "Co-Leader",
+    clanMember: "Member",
+    promoteMember: "Promote Member",
+    demoteMember: "Demote Member",
+    kickMember: "Kick Member",
+    memberPromoted: "Member promoted",
+    memberDemoted: "Member demoted",
+    memberKicked: "Member kicked"
+}
+// When creating friends
+const newFriend = {
+    id: 'friend' + Date.now(),
+    name: randomName,
+    tag: randomTag,
+    level: randomLevel,
+    clicks: randomClicks,
+    coins: randomCoins,
+    clan: Math.random() > 0.5 ? 'Night Owls' : null,
+    clanId: Math.random() > 0.5 ? 'clan1' : null
+};
 // Audio elements
 const audioElements = {
     click: document.getElementById('click-sound'),
